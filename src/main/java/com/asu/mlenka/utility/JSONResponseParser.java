@@ -52,16 +52,19 @@ public class JSONResponseParser {
 				throw new IllegalArgumentException();
 			}
 			totalPriceInCents = dollars.multiply(new BigDecimal(100)).longValue();
-			
+
 			addToOrderValueQ(totalPriceInCents);
 			putInCustomerOrderTimeMap(customerId, createdAt.getMillis());
-			
+
 			JSONArray items = jsonOrder.getJSONArray("line_items");
 			for (int j = 0; j < items.length(); j++) {
 				JSONObject jsonItem = items.getJSONObject(j);
 				String itemId = jsonItem.getString("product_id");
 				Long quantity = jsonItem.getLong("quantity");
-				itemCountMap.put(itemId, itemCountMap.getOrDefault(itemId, 0l) + quantity);
+				if (itemCountMap.containsKey(itemId)) {
+					quantity += itemCountMap.get(itemId);
+				}
+				itemCountMap.put(itemId, quantity);
 			}
 
 		}
